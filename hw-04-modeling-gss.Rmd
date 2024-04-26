@@ -165,11 +165,11 @@ gss16_wflow_1 <- workflow() %>%
 set.seed(685)
 gss16_folds <- vfold_cv(gss16_train, v = 5)
 
-gss16_fit_rs_1 <- gss16_wflow_1 %>%
-  fit_resamples(resamples = gss16_folds)
+# gss16_fit_rs_1 <- gss16_wflow_1 %>%
+  # fit_resamples(resamples = gss16_folds)
 
- collect_metrics(gss16_fit_rs_1, summarize = FALSE)
- collect_metrics(gss16_fit_rs_1)
+ # collect_metrics(gss16_fit_rs_1, summarize = FALSE)
+ # collect_metrics(gss16_fit_rs_1)
 ```
 
 9.  Now, try a different, simpler model: predict `advfront` from only `polviews` and `educ`.
@@ -184,13 +184,13 @@ gss16_wflow_2 <- workflow() %>%
   add_recipe(gss16_rec_2)
 
 set.seed(317)
-gss16_folds <- vfold_cv(gss16_train, v = 5)
+# gss16_folds <- vfold_cv(gss16_train, v = 5)
 
-gss16_fit_rs_2 <- gss16_wflow_2 %>%
-  fit_resamples(resamples = gss16_folds)
+# gss16_fit_rs_2 <- gss16_wflow_2 %>%
+  # fit_resamples(resamples = gss16_folds)
 
-collect_metrics(gss16_fit_rs_2, summarize = FALSE)
-collect_metrics(gss16_fit_rs_2)
+# collect_metrics(gss16_fit_rs_2, summarize = FALSE)
+# collect_metrics(gss16_fit_rs_2)
 
 ```
 
@@ -229,8 +229,36 @@ The question is phrased as the following.
 Answers to this question are stored in the `harass5` variable in our dataset.
 
 12. Create a subset of the data that only contains `Yes` and `No` answers for the harassment question. How many responses chose each of these answers?
+```{r}
+
+gss16_subset <- gss16 %>%
+  filter(harass5 %in% c("Yes", "No"))
+
+yes_no_counts <- gss16_subset %>%
+  count(harass5) %>%
+  print(yes_no_counts)
+
+
+```
+
 13. Describe how bootstrapping can be used to estimate the proportion of Americans who have been harassed by their superiors or co-workers at their job.
+
+***You can simulate the distribution of the proportion of people that were harassed.**
+
 14. Calculate a 95% bootstrap confidence interval for the proportion of Americans who have been harassed by their superiors or co-workers at their job. Interpret this interval in context of the data.
+
+```{r}
+gss16_boot <- gss16_subset %>%
+  specify(response = harass5, success = "Yes") %>%
+  generate(reps = 15000, type = "bootstrap") %>%
+  calculate(stat = "prop")
+
+gss16_boot %>%
+  summarize(lower = quantile(stat, 0.025),
+            upper = quantile(stat, 0.975))
+```
+***There is a 95% chance that the proportion of Americans who were harassed is between 15 and 19 percent.***
 15. Would you expect a 90% confidence interval to be wider or narrower than the interval you calculated above? Explain your reasoning.
 
+***90% confidence would be narrower as it would need to be less accurate, and therefore could be more precise.***
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards and review the md document on GitHub to make sure you're happy with the final state of your work.*
