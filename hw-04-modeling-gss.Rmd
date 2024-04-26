@@ -99,7 +99,9 @@ gss16 %>%
     polviews = fct_relevel(polviews, "Conservative", "Moderate", "Liberal")
   )
 
-
+polviews_counts <- gss16 %>%
+  count(polviews) %>%
+  print(polviews_counts)
 ```
 
 3.  Create a new data frame called `gss16_advfront` that includes the variables `advfront`, `educ`, `polviews`, and `wrkstat`. Then, use the `drop_na()` function to remove rows that contain `NA`s from this new data frame. Sample code is provided below.
