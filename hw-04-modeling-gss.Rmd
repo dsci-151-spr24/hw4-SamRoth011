@@ -1,5 +1,6 @@
 ---
 title: "HW 04 - Modeling the GSS"
+author: "Sam Roth"
 output: html_document
 ---
 
@@ -67,11 +68,40 @@ It's important that you don't recode the NAs, just the remaining levels.
 
 1.  Re-level the `advfront` variable such that it has two levels: `Strongly agree` and "`Agree"` combined into a new level called `agree` and the remaining levels (except `NA`s) combined into "`Not agree"`. Then, re-order the levels in the following order: `"Agree"` and `"Not agree"`. Finally, `count()` how many times each new level appears in the `advfront` variable.
 
+```{r}
+gss16 %>%
+  mutate(
+    advfront = fct_collapse(
+      advfront,
+      agree = c("Strongly agree", "Agree"),
+      `Not agree` = c("Don't know", "Disagree", "Strongly Disagree")),
+    advfront = fct_relevel(advfront, "agree", "Not agree")
+  )
+
+advfront_counts <- gss16 %>%
+  count(advfront) %>%
+  print(advfront_counts)
+```
+
+
 ```{marginfigure}
 You can do this in various ways. One option is to use the `str_detect()` function to detect the existence of words like liberal or conservative. Note that these sometimes show up with lowercase first letters and sometimes with upper case first letters. To detect either in the `str_detect()` function, you can use "[Ll]iberal" and "[Cc]onservative". But feel free to solve the problem however you like, this is just one option!
 ```
 
 2.  Combine the levels of the `polviews` variable such that levels that have the word "liberal" in them are lumped into a level called `"Liberal"` and those that have the word conservative in them are lumped into a level called `"Conservative"`. Then, re-order the levels in the following order: `"Conservative"` , `"Moderate"`, and `"Liberal"`. Finally, `count()` how many times each new level appears in the `polviews` variable.
+```{r}
+gss16 %>%
+  mutate(
+    polviews = case_when(
+      str_detect(polviews, "[Ll]iberal") ~ "Liberal",
+      str_detect(polviews, "[Cc]onservative") ~ "Conservative",
+      TRUE ~ "Moderate"),
+    polviews = fct_relevel(polviews, "Conservative", "Moderate", "Liberal")
+  )
+
+
+```
+
 3.  Create a new data frame called `gss16_advfront` that includes the variables `advfront`, `educ`, `polviews`, and `wrkstat`. Then, use the `drop_na()` function to remove rows that contain `NA`s from this new data frame. Sample code is provided below.
 
 ```{r eval=FALSE}
